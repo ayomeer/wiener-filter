@@ -6,7 +6,7 @@ import matplotlib.gridspec as gridspec
 from matplotlib.widgets import Slider
 
 # --- Config ------------------------------------------------------------
-H_TYPE = 'box' # degradation function
+H_TYPE = 'box' # options: 'box', 'gaussiain', ('sinc')
 FILTER_METHOD = 'wienerK' # options: 'inverse', 'wienerK', 'wienerC'  
 
 NOISE_STD_DEV = 0.01
@@ -50,8 +50,8 @@ def inverseFiltering(g, h):
     # -- Transform image and degradation functions into fourier domain
     P = (M + h.shape[0]-1, N + h.shape[1]-1) # avoid circular conv
     
-    G = np.fft.fft2(g, P)
-    H = np.fft.fft2(h, P)
+    G = np.fft.fft2(g, P) # input zero-padded before transform
+    H = np.fft.fft2(h, P) 
 
     F_hat = G/H
     f_hat = np.fft.ifft2(F_hat, P)

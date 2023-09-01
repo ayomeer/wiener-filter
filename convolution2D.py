@@ -12,7 +12,7 @@ def convolve2D(img, w1, w2, plotIntermediate=False):
         g[m] = np.convolve(img[m,:], w1, mode='same')
     
     if plotIntermediate == True:
-        plt.figure()
+        plt.figure(); plt.title('seperable conv intermediate result')
         plt.imshow(g, cmap='gray')
         plt.show(block=False)
 
@@ -38,12 +38,12 @@ if __name__ == '__main__':
     w2 = np.ones((1,3)).squeeze()*1/3
 
     g = convolve2d(img, w, mode='same')
-    g_sep = convolve2D(img, w1, w2)  
+    g_sep = convolve2D(img, w1, w2, plotIntermediate=False)  
 
-    plt.figure()
+    plt.figure(); plt.title('convoltion output 2D')
     plt.imshow(g, cmap='gray')
     plt.show(block=False)
 
-    plt.figure()
+    plt.figure(); plt.title('convoltion output 1D*1D')
     plt.imshow(g_sep, cmap='gray')
     plt.show()
