@@ -7,7 +7,7 @@ from matplotlib.widgets import Slider
 
 # --- Config ------------------------------------------------------------
 H_TYPE = 'box' # options: 'box', 'gaussiain', ('sinc')
-FILTER_METHOD = 'wienerK' # options: 'inverse', 'wienerK', 'wienerC'  
+FILTER_METHOD = 'wienerC' # options: 'inverse', 'wienerK', 'wienerC'  
 
 NOISE_STD_DEV = 0.01
 WIENER_K = NOISE_STD_DEV * 2
@@ -58,7 +58,7 @@ def inverseFiltering(g, h):
 
     return f_hat
 
-def wienerFiltering(g, h, K):
+def wienerKFiltering(g, h, K):
     P = (M + h.shape[0]-1, N + h.shape[1]-1) # avoid circular conv
     
     G = np.fft.fft2(g, P)
@@ -70,6 +70,29 @@ def wienerFiltering(g, h, K):
     f_hat = np.fft.ifft2(F_hat, P)
     
     return np.real(f_hat)
+
+
+NOISE_POWER = (M*N)**2*NOISE_STD_DEV**2
+def wienerCFiltering(g, h, gamma):
+    P = (M + h.shape[0]-1, N + h.shape[1]-1) # avoid circular conv
+
+    G = np.fft.fft2(g, P)
+    H = np.fft.fft2(h, P)
+
+    u, v = np.arange(P[0]), np.arange(P[1])
+    uu, vv = np.meshgrid(u, v)
+    C = -4*np.pi**2*(uu**2+vv**2)
+
+    W = (1/H) * (np.abs(H)**2)/(np.abs(H)**2 + gamma*np.abs(C)**2)
+
+    F_hat = G*W
+
+    phi = sum(sum(abs(G-H*F_hat)**2))
+
+    f_hat = np.fft.ifft2(F_hat, P)
+    
+    return np.real(f_hat), phi
+
 
 if __name__ == '__main__':
 
@@ -98,24 +121,44 @@ if __name__ == '__main__':
             # Set up figure
             gs = gridspec.GridSpec(10,4)
             fig = plt.figure()
-            axImg =    fig.add_subplot(gs[0:8,:])
+            axImg = fig.add_subplot(gs[0:8,:])
             
             # Set up slider to change K interactively
             axSlider = fig.add_subplot(gs[9,:])
             sl = Slider(axSlider, 'K', 0, 0.2, valinit=0, valstep=0.001)
 
             def sl_changed(sliderK):
-                f_hat = wienerFiltering(g, h, sliderK)
+                f_hat = wienerKFiltering(g, h, sliderK)
                 im.set_data(f_hat)
 
             sl.on_changed(sl_changed)
 
             # Do filtering and show result
-            f_hat = wienerFiltering(g, h, WIENER_K)
+            f_hat = wienerKFiltering(g, h, WIENER_K)
             im = axImg.imshow(f_hat, cmap='gray')
             
         case 'wienerC':
-            pass
+            # Set up figure
+            gs = gridspec.GridSpec(10,4)
+            fig = plt.figure()
+            axImg = fig.add_subplot(gs[0:8,:])
+            fig.text(0.6, 0.95, "noise power = {}".format(NOISE_POWER))
+            t = fig.text(0.1, 0.95 ," ")
+
+            # Set up slider to change K interactively
+            axSlider = fig.add_subplot(gs[9,:])
+            sl = Slider(axSlider, 'gamma', 0, 1e-12, valinit=0, valstep=1e-15)
+
+            def sl_changed(sliderVal):
+                f_hat, phi = wienerCFiltering(g, h, sliderVal)
+                im.set_data(f_hat)
+                t.set_text("phi = {}".format(phi))
+
+            sl.on_changed(sl_changed)
+
+            # Do filtering and show result
+            f_hat, _ = wienerCFiltering(g, h, 0)
+            im = axImg.imshow(np.clip(f_hat, 0, 1), cmap='gray')
 
     plt.show(block=True)
 
