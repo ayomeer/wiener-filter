@@ -20,9 +20,10 @@ h = np.zeros_like(n).astype(float); h[1:200] = 0.5; # h[-50:-1] = 0.5
 h_ = np.flip(h)
 
 # circular conv in fourier domain
+
 g = np.real(np.fft.ifft(np.fft.fft(f)*np.fft.fft(h)))
 
-def setupCircConvPlot():
+def circConvPlot():
     # Set up convolution plot
     gs = gridspec.GridSpec(12,6)
     fig = plt.figure()
@@ -39,11 +40,12 @@ def setupCircConvPlot():
     l_f, = ax_inputs.plot(n, f)
     l_h, = ax_inputs.plot(-n, h, color='C2')
     l_g, = ax_output.plot(n, g, color='C1', zorder=1)
-    p_g = ax_output.scatter(0, g[0], color='orange', zorder=2)
+    p_g = ax_output.scatter(0, g[0], color='orange', zorder=3)
 
     ax_output.set_ylim(ymin=-20, ymax=120)
 
     if CIRCULAR == True:
+        # plot copies of spectrum and time signal
         l_hr, = ax_inputs.plot(-n+n.size, h, color='C2', linestyle='--', alpha=0.65)
         l_hl, = ax_inputs.plot(-n-n.size, h, color='C2', linestyle='--', alpha=0.65)
         
@@ -118,8 +120,13 @@ def setupCircConvPlot():
 if __name__ == '__main__':
     # Compute convolution in time domain for reference
     g_lin = np.convolve(f,h)
-    plt.figure(); plt.title('linear convolution in time domain')
-    plt.plot(np.arange(g_lin.size), g_lin, color='C1')
+    fig = plt.figure()
+    ax1 = fig.add_subplot(211)
+    ax2 = fig.add_subplot(212)
+
+    ax1.plot(n, f)
+    ax1.plot(-n, h, color='C2')
+    ax2.plot(np.arange(g_lin.size), g_lin, color='C1')
     plt.show(block=False)
 
-    setupCircConvPlot()
+    circConvPlot()

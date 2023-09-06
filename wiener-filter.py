@@ -11,23 +11,27 @@ PI = np.pi
 # --- Config ------------------------------------------------------------
 # Input
 INPUT_IMG = 'aerial' # options: 'generated', 'aerial'
-GEN_TYPE = 'square'     # options: 'half-half', 'square'
+GEN_TYPE = 'square' # options: 'half-half', 'square'
 
 # Blurring Degradation
-CONV_MODE = 'valid'     # options: 'valid', 'same', 'full'
+CONV_MODE = 'valid' # options: 'valid', 'same', 'full'
 
-H_TYPE = 'gaussian'     # options: 'box', 'gauss', ('sinc')
+H_TYPE = 'gaussian' # options: 'box'(ringing!->artifacts), 'gaussian'
 STD_DEV_GAUSS_KERNEL = 1
 VIZ_KERNEL = False
 
 # Noise Degradation
-NOISE_ENABLE = False    # options: True, False
+NOISE_ENABLE = True # options: True, False
 NOISE_STD_DEV = 0.01 
-WIENER_K = NOISE_STD_DEV * 2
+WIENER_K = 0
 
 # Restoration Filtering
-PAD_METHOD = 'none'       # options: 'none', 'zero', 'mirror'
+PAD_METHOD = 'mirror' # options: 'none', 'zero', 'mirror' (none=>circConv)
+CROP_RESULT = False # options: True, False (valid result)
 FILTER_METHOD = 'wienerC' # options: 'inverse', 'wienerK', 'wienerC'  
+
+WIENER_K_SLIDERMAX = 0.1
+WIENER_K_SLIDERSTEP = 0.001
 
 
 # --- Setup ---------------------------------------------------------
@@ -97,7 +101,7 @@ g = convolve2d(f, h, mode=CONV_MODE)
 
 # Add (white) noise
 if NOISE_ENABLE == True:
-    g += np.random.normal(0, NOISE_STD_DEV, g.shape)
+    g += np.clip(np.random.normal(0, NOISE_STD_DEV, g.shape), 0, 1)
 
 # Padding (prep for inverse filtering in fourier domain)
 P = (g.shape[0]+h.shape[0]-1, g.shape[1]+h.shape[1]-1)   
@@ -111,16 +115,7 @@ match PAD_METHOD:
     case 'mirror':
         g_pad = np.hstack((g, np.fliplr(g)))
         g_pad = np.vstack((g_pad, np.flipud(g_pad)))
-        # g_pad = g_pad[0:P[0], 0:P[1]]
 
-# --- Helper Functions --------------------------------------------------
-def getMinNeighborhoodVariance(g):
-    pass # TODO implement local variances
-
-# def mirrorPad(f):
-#     f = np.hstack((f, np.fliplr(f)))
-#     f = np.vstack((f, np.flipud(f)))
-#     return f
 
 
 # --- Restoration Filter Implementations ----------------------------------------------
@@ -146,7 +141,7 @@ def wienerKFiltering(g, h, K):
     return np.clip(np.real(f_hat), 0, 1)
 
 
-NOISE_POWER = (M*N)**2*NOISE_STD_DEV**2 # TODO: get this from local neighborhood variance
+NOISE_POWER = (M*N)**2*NOISE_STD_DEV**2 
 def wienerCFiltering(g, h, gamma):
     G = np.fft.fft2(g)
     H = np.fft.fft2(h, g.shape)
@@ -169,8 +164,8 @@ def wienerCFiltering(g, h, gamma):
 if __name__ == '__main__':
     # Show original- and distorted image
     fig0 = plt.figure(figsize=(10,5))
-    im0 = fig0.add_subplot(131); im0.set_title('original image')
-    im1 = fig0.add_subplot(132); im1.set_title('degraded (blurred + noise)')
+    im0 = fig0.add_subplot(131); im0.set_title(r'original image $f(x,y)$')
+    im1 = fig0.add_subplot(132); im1.set_title(r'degraded image $g(x,y)$')
     im2 = fig0.add_subplot(133); im2.set_title('degraded + padded')
     im0.imshow(f, cmap='gray')
     im1.imshow(g, cmap='gray')
@@ -178,12 +173,16 @@ if __name__ == '__main__':
     plt.show(block=False)
 
     # --- Image Restoration -------------------------------------------
-    M, N = g.shape
+    if CROP_RESULT == True:
+        M, N = g.shape[0]-h.shape[0]-1, g.shape[1]-h.shape[1]-1
+    else:
+        M, N = g.shape
+
     match FILTER_METHOD:
         case 'inverse':
             f_hat = inverseFiltering(g_pad, h)
 
-            plt.figure(); plt.title('Restoration filter output')
+            plt.figure(); plt.title(r'Restoration filter output $\hat{f}(x,y)$')
             plt.imshow(f_hat[0:M, 0:N], cmap='gray')
             plt.show()
     
@@ -195,7 +194,7 @@ if __name__ == '__main__':
             
             # Set up slider to change K interactively
             axSlider = fig.add_subplot(gs[9,:])
-            sl = Slider(axSlider, 'K', 0, 0.2, valinit=0, valstep=0.001)
+            sl = Slider(axSlider, 'K', 0, WIENER_K_SLIDERMAX, valinit=0, valstep=WIENER_K_SLIDERSTEP)
 
             def sl_changed(sliderK):
                 f_hat = wienerKFiltering(g_pad, h, sliderK)
@@ -204,7 +203,7 @@ if __name__ == '__main__':
             sl.on_changed(sl_changed)
 
             # Do filtering and show result (first run)
-            f_hat = wienerKFiltering(g_pad, h, WIENER_K)
+            f_hat = wienerKFiltering(g_pad, h, 0)
             im = axImg.imshow(f_hat[0:M, 0:N], cmap='gray')
             
             
@@ -220,7 +219,7 @@ if __name__ == '__main__':
             axSlider = fig.add_subplot(gs[9,:])
 
             if INPUT_IMG == 'generated': gamma_mag = -12 
-            elif INPUT_IMG =='aerial': gamma_mag = -16
+            elif INPUT_IMG =='aerial': gamma_mag = -17
 
             sl = Slider(axSlider, 'gamma', 0, 10**(gamma_mag), valinit=0, valstep=10**((gamma_mag-3)))
 

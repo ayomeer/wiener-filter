@@ -1,9 +1,16 @@
 \documentclass{article}
 
 \usepackage{amsmath}
+\usepackage{trfsigns}
+\usepackage{mathtools}
+\usepackage{tikz-cd}
 
 \begin{document}
 
+
+
+
+\section{Degradation}
 % 2D -> 2*1D
 \begin{equation}
     f(x,y)*w(x,y) \stackrel{?}{=} f(x,y)*w_{x}(x)*w_{y}(y)
@@ -18,7 +25,6 @@
 \begin{equation}
    w_{x}(x) * w_{y}(y) = w_{x}(x) \cdot w_{y}(y) 
 \end{equation}
-
 
 
 % Box Kernel 
@@ -86,5 +92,87 @@
           54 & 242 & 399 & 242 & 54 \\
     \end{bmatrix}
 \end{equation}
+
+
+\newpage
+\section{Inverse Filterung}
+
+FW-Filterung im Frequenzbereich
+
+\begin{equation}
+    g(x,y)*f(x,y) \quad \laplace \quad G(u,y) \cdot F(u,v)
+\quad \Rightarrow \quad
+    g(x,y) = IDFT\Big[DFT[f(x,y)] \cdot DFT[h(x,y)]\Big]
+\end{equation}
+
+
+\begin{align*}
+    \text{diskrete Zeitsequenz} \quad &\laplace \quad \text{periodisches Spektrum} \\
+    \text{periodische Zeitsequenz} \quad &\laplace \quad \text{diskretes Spektrum}
+\end{align*}
+
+
+Inverse Filterung im Frequenzbereich
+\begin{equation}
+    W(u,v) = \frac{1}{H(u,v)}
+    \quad \Rightarrow \quad
+    \hat{F}(u,v) = F(u,v) \cdot H(u,v) \cdot \frac{1}{H(u,v)} = F(u,v)
+\end{equation}
+
+Idealisierte Lösung
+
+\begin{align*}
+    H_{gauss}(u,v) \\
+    & H_{box}(u,v) \\
+    & 1/H_{gauss}(u,v) \\
+    & 1/H_{box}(u,v) 
+\end{align*}
+
+
+\newpage
+\section{Wiener-Filter}
+
+\begin{equation}
+    J(w(x,y)) = \mathbf{E}\Big\{ (f(x,y) - \hat{f}(x,y))^2 \Big\} 
+    \quad \xRightarrow{\text{Parseval}} \quad
+    J(W(u,v)) = \mathbf{E}\Big\{ \big|(F(u,v) - \hat{F}(u,v)\big|^2 \Big\}  
+\end{equation}
+   
+
+\begin{align*}
+     J(W) &= \mathbf{E}\Big\{ \big|(F - \hat{F}\big|^2 \Big\} \\
+     &= \mathbf{E}\Big\{ \big|(F -  G \cdot W \big|^2 \Big\} \\
+     &\vdots \\
+     J(W) &= S_f + W W^\star \Big[ S_f |H|^2 + S_n \Big] - S_f W H - S_f W^\star H \\
+     \frac{\partial J(W)}{\partial W} &= W^\star  \Big[ S_f |H|^2 + S_n \Big] - S_f H \quad \stackrel{!}{=} 0 \\
+     &\Updownarrow \\
+     W^\star &= \frac{S_f H}{S_f |H|^2 + S_n} = \frac{H}{|H|^2 + \frac{S_n}{S_f}} 
+     \quad \Leftrightarrow \quad
+     W = \frac{H^\star}{|H|^2 + \frac{S_n}{S_f}} = 
+     \frac{1}{H} \cdot \frac{|H|^2}{|H|^2 + \frac{S_n}{S_f}}\\
+\end{align*}
+
+\begin{equation}
+     W = \frac{1}{H} \cdot \frac{|H|^2}{|H|^2 + K}
+\end{equation}
+
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
