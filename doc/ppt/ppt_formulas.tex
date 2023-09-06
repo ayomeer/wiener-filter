@@ -1,0 +1,90 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\begin{document}
+
+% 2D -> 2*1D
+\begin{equation}
+    f(x,y)*w(x,y) \stackrel{?}{=} f(x,y)*w_{x}(x)*w_{y}(y)
+\end{equation}
+
+% Separability 
+\begin{equation}
+    w(x,y) = w_{x}(x) \cdot w_{y}(y)
+\end{equation}
+
+% Equality mult conv for kernel
+\begin{equation}
+   w_{x}(x) * w_{y}(y) = w_{x}(x) \cdot w_{y}(y) 
+\end{equation}
+
+
+
+% Box Kernel 
+\begin{equation}
+    w(x,y) =
+    \begin{bmatrix}
+        1 & 1 & 1 \\
+        1 & 1 & 1 \\
+        1 & 1 & 1
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        1 \\
+        1 \\
+        1
+    \end{bmatrix}
+    \cdot
+    \begin{bmatrix}
+    1 & 1 & 1 
+    \end{bmatrix}
+    =
+    w_{x}(x) \cdot w_{y}(y) 
+\end{equation}
+
+
+% Gauss Kernel
+\begin{equation}
+    w_{G}(x,y) = \frac{1}{\pi*2\sigma^2} \cdot \exp\left(-\frac{x^2+y^2}{2\sigma^2}\right)
+    = 
+    \underbrace{
+    \left(
+    \frac{1}{\sigma \sqrt{2\pi}} \cdot \exp\left(-\frac{x^2}{2\sigma^2}\right)
+    \right)
+    }_{w_{x}(x)}
+    \cdot
+    \underbrace{
+    \left(
+    \frac{1}{\sigma \sqrt{2\pi}} \cdot
+    \exp\left(-\frac{y^2}{2\sigma^2}\right)
+    \right)
+    }_{w_{y}(y)}
+\end{equation}
+
+% Gauss kernel matrix form
+\begin{equation}
+    10^{-3} \cdot
+    \begin{bmatrix}
+        3 & 13 & 21 & 13 & 3  \\
+        13 & 58 & 96 & 58 & 13 \\
+        21 & 96 & 159 & 96 & 21\\    
+        13 & 58 & 96 & 58 & 13 \\
+        3 & 13  & 21 & 13 & 3 \\
+    \end{bmatrix}
+    \approx   
+    10^{-6} \cdot 
+    \begin{bmatrix}
+        54 \\
+        241 \\
+        399 \\
+        242 \\
+        54 \\
+    \end{bmatrix}
+    \cdot
+    \begin{bmatrix}
+          54 & 242 & 399 & 242 & 54 \\
+    \end{bmatrix}
+\end{equation}
+\end{document}
+
