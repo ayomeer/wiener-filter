@@ -13,7 +13,7 @@
 \section{Degradation}
 % 2D -> 2*1D
 \begin{equation}
-    f(x,y)*w(x,y) \stackrel{?}{=} f(x,y)*w_{x}(x)*w_{y}(y)
+    f(x,y)*w(x,y) = \Big(f(x,y)*w_{x}(x)\Big) *w_{y}(y)
 \end{equation}
 
 % Separability 
@@ -155,6 +155,20 @@ Idealisierte Lösung
 \begin{equation}
      W = \frac{1}{H} \cdot \frac{|H|^2}{|H|^2 + K}
 \end{equation}
+
+
+\begin{equation}
+    \mathbf{E}\Big\{
+        F(u,v) \cdot N(u,v)
+    \Big\}  = 0
+\end{equation}
+
+
+Addon Rauschen
+\begin{equation}
+    \hat{F}(u,v) = \underbrace{F(u,v)\cdot H_{LPF}(u,v) + N(u,v)}_{G(u,v)} \cdot \underbrace{\frac{1}{H_{LPF}(u,v)}}_{W(u,v)} = F(u,v) + \frac{N(u,v)}{H_{LPF}(u,v)}
+\end{equation}
+
 
 \end{document}
 

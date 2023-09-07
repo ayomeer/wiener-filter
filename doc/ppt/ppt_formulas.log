@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.12) (preloaded format=pdflatex 2022.12.17)  7 SEP 2023 00:35
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.12) (preloaded format=pdflatex 2022.12.17)  7 SEP 2023 11:22
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -583,7 +583,7 @@ Overfull \hbox (1.54124pt too wide) detected at line 153
 Here is how much of TeX's memory you used:
  14058 strings out of 475281
  302107 string characters out of 2774064
- 625033 words of memory out of 3000000
+ 626035 words of memory out of 3000000
  35319 multiletter control sequences out of 15000+600000
  471245 words of font info for 35 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -601,7 +601,7 @@ cm/cmr7.pfb><C:/Users/ayome/AppData/Local/Programs/MiKTeX/fonts/type1/public/am
 sfonts/cm/cmsy10.pfb><C:/Users/ayome/AppData/Local/Programs/MiKTeX/fonts/type1/
 public/amsfonts/cm/cmsy7.pfb><C:/Users/ayome/AppData/Local/Programs/MiKTeX/font
 s/type1/public/amsfonts/latxfont/lcircle1.pfb>
-Output written on ppt_formulas.pdf (3 pages, 125683 bytes).
+Output written on ppt_formulas.pdf (3 pages, 128349 bytes).
 PDF statistics:
  70 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
